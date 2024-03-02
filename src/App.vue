@@ -6,15 +6,18 @@
     <audio preload="metadata" crossorigin="anonymous" ref="audioElement" controls>
       <source src="https://assets.rpy.xyz/testmedia/semper_fidelis.mp3" type="audio/mpeg" />
     </audio>
-    <WebAudioPeakMeter v-model:src-node="audioNode" style="height: 80px; margin-bottom: 1rem" />
+    <web-audio-peak-meter
+      v-model:src-node="audioNode"
+      style="height: 80px; margin-bottom: 1rem"
+    ></web-audio-peak-meter>
     <div style="display: flex">
-      <WebAudioPeakMeter
+      <web-audio-peak-meter
         v-model:src-node="audioNode"
         :peak-hold-duration="config.peakHoldDuration"
         :vertical="true"
         style="height: 300px; width: 80px; margin-right: 1rem"
       />
-      <WebAudioPeakMeter
+      <web-audio-peak-meter
         v-model:src-node="audioNode"
         :peak-hold-duration="config.peakHoldDuration"
         :vertical="true"
@@ -26,7 +29,6 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { WebAudioPeakMeter } from './components';
 
 const audioElement = ref<HTMLMediaElement>();
 const audioContext = ref<AudioContext>();

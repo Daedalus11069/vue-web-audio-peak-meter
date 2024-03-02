@@ -1,15 +1,15 @@
 <template>
   <div>
-    <div class="meter-container" :class="{ 'meter-vertical': vertical }">
-      <div class="meter-channels">
-        <div class="meter-channel" v-for="channel in channels">
-          <div class="meter-peak-label">{{ channel.label }}</div>
-          <div class="meter-peak-bar" :style="`--audio-clip-path: ${channel.percent}%`"></div>
+    <div class="container" :class="{ vertical }">
+      <div class="channels">
+        <div class="channel" v-for="channel in channels">
+          <div class="peak-label">{{ channel.label }}</div>
+          <div class="peak-bar" :style="`--audio-clip-path: ${channel.percent}%`"></div>
         </div>
       </div>
-      <div class="meter-ticks">
+      <div class="ticks">
         <div
-          class="meter-tick"
+          class="tick"
           :style="`--percent-in-range: ${percentInRange}%`"
           v-for="{ tick, percentInRange } in ticks"
         >
@@ -123,13 +123,15 @@ const gradientJoined = computed(() => {
   return props.gradient.join(', ');
 });
 
+const cssVars = computed(() => ({
+  verticalChannelWidth: props.fontSize * verticalTickWidth.value + 'px',
+  verticalBarHeight: props.fontSize * verticalLabelHeight.value + 'px',
+  horizontalBarWidth: props.fontSize * horizontalLabelWidth.value + 'px'
+}));
+
 //const totalBorder = computed(() => (channels.value.length - 1) * props.borderSize);
 
-defineExpose({ peaks, clearPeaks });
-
-watchEffect(() => {
-  //console.log(channels.value[0]);
-});
+defineExpose({ peaks, clearPeaks, srcNode });
 
 onMounted(async () => {
   const { audioMeterStandard } = props;
@@ -142,32 +144,30 @@ onMounted(async () => {
 
   watch(
     srcNode,
-    async (isReady) => {
-      if (isReady) {
-        if (srcNode.value) {
-          try {
-            node.value = new AudioWorkletNode(
-              srcNode.value.context,
-              `${audioMeterStandard}-processor`,
-              {
-                parameterData: {}
-              }
-            );
-          } catch (_err) {
-            const workletUrl =
-              audioMeterStandard === 'true-peak' ? truePeakProcessor : peakSampleProcessor;
-            await srcNode.value.context.audioWorklet.addModule(workletUrl);
-            node.value = new AudioWorkletNode(
-              srcNode.value.context,
-              `${audioMeterStandard}-processor`,
-              {
-                parameterData: {}
-              }
-            );
-          }
-          node.value.port.onmessage = (ev: MessageEvent) => handleNodePortMessage(ev);
-          srcNode.value.connect(node.value).connect(srcNode.value.context.destination);
+    async () => {
+      if (srcNode.value) {
+        try {
+          node.value = new AudioWorkletNode(
+            srcNode.value.context,
+            `${audioMeterStandard}-processor`,
+            {
+              parameterData: {}
+            }
+          );
+        } catch (_err) {
+          const workletUrl =
+            audioMeterStandard === 'true-peak' ? truePeakProcessor : peakSampleProcessor;
+          await srcNode.value.context.audioWorklet.addModule(workletUrl);
+          node.value = new AudioWorkletNode(
+            srcNode.value.context,
+            `${audioMeterStandard}-processor`,
+            {
+              parameterData: {}
+            }
+          );
         }
+        node.value.port.onmessage = (ev: MessageEvent) => handleNodePortMessage(ev);
+        srcNode.value.connect(node.value).connect(srcNode.value.context.destination);
       }
     },
     {
@@ -184,98 +184,97 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.meter-container {
+.container {
   background-color: v-bind('backgroundColor');
   box-sizing: border-box;
   height: 100%;
-  padding: v-bind('borderSize + "px"');
+  padding: calc(v-bind('borderSize') * 1px);
 
-  .meter-peak-label {
+  .peak-label {
     color: v-bind('labelColor');
     font-size: v-bind('fontSize');
   }
-  .meter-channels {
+  .channels {
     --channel-size: calc(50% - 1px);
     justify-content: space-between;
   }
-  &:not(&.meter-vertical) .meter-channels {
+  &:not(.vertical) .channels {
     display: flex;
     flex-direction: column;
-    height: calc(100% - v-bind('fontSize * horizontalTickHeight + "px"'));
+    height: calc(100% - (v-bind('fontSize * horizontalTickHeight') * 1px));
     width: 100%;
-    .meter-channel {
+    .channel {
       display: flex;
       height: var(--channel-size);
       width: 100%;
       flex-direction: row-reverse;
-      .meter-peak-label {
+      .peak-label {
         display: flex;
         justify-content: center;
         align-items: center;
-        width: v-bind('fontSize * horizontalLabelWidth + "px"');
+        width: calc(v-bind('fontSize * horizontalLabelWidth') * 1px);
       }
-      .meter-peak-bar {
-        transition: clip-path v-bind('maskTransition');
+      .peak-bar {
         height: 100%;
-        width: calc(100% - v-bind('fontSize * horizontalLabelWidth + "px"'));
+        width: calc((100% - v-bind('cssVars.horizontalBarWidth')));
         background-image: linear-gradient(to left, v-bind('gradientJoined'));
+        transition: clip-path v-bind('maskTransition');
         clip-path: inset(0 var(--audio-clip-path) 0 0);
-        transition: clip-path 0.1s ease 0s;
       }
     }
   }
 
-  &:not(&.meter-vertical) .meter-ticks {
+  &:not(.vertical) .ticks {
     position: relative;
-    height: v-bind('fontSize * horizontalTickHeight + "px"');
-    width: calc(100% - v-bind('fontSize * horizontalLabelWidth + "px"'));
-    margin-right: v-bind('fontSize * horizontalLabelWidth + "px"');
-    .meter-tick {
+    height: calc(v-bind('fontSize * horizontalTickHeight') * 1px);
+    width: calc((100% - v-bind('fontSize * horizontalLabelWidth')) * 1px);
+    margin-right: calc(v-bind('fontSize * horizontalLabelWidth') * 1px);
+    .tick {
       position: absolute;
       color: v-bind('tickColor');
-      font-size: v-bind('fontSize + "px"');
+      font-size: calc(v-bind('fontSize') * 1px);
       right: var(--percent-in-range);
       transform: translateX(50%);
     }
   }
 
-  &.meter-vertical {
+  &.vertical {
     display: flex;
     flex-direction: row-reverse;
-    .meter-channels {
+    .channels {
       display: flex;
       flex-direction: row;
       height: 100%;
-      width: calc(100% - v-bind('fontSize * verticalTickWidth + "px"'));
-      .meter-channel {
+      width: calc((100% - v-bind('cssVars.verticalChannelWidth')));
+      .channel {
         height: 100%;
         width: var(--channel-size);
-        .meter-peak-label {
-          height: v-bind('fontSize * verticalLabelHeight + "px"');
+        .peak-label {
+          height: calc(v-bind('fontSize * verticalLabelHeight') * 1px);
           width: 100%;
           text-align: center;
         }
-        .meter-peak-bar {
-          height: calc(100% - v-bind('fontSize * verticalLabelHeight + "px"'));
+        .peak-bar {
+          height: calc(100% - v-bind('cssVars.verticalBarHeight'));
           width: 100%;
           background-image: linear-gradient(to bottom, v-bind('gradientJoined'));
           clip-path: inset(var(--audio-clip-path) 0 0);
-          transition: clip-path 0.1s ease 0s;
+          transition: clip-path v-bind('maskTransition');
         }
       }
     }
 
-    .meter-ticks {
+    .ticks {
       position: relative;
-      height: calc(100% - v-bind('fontSize * verticalLabelHeight + "px"'));
-      width: v-bind('fontSize * verticalTickWidth + "px"');
-      margin-top: v-bind('fontSize * verticalLabelHeight + "px"');
-      .meter-tick {
+      height: calc((100% - v-bind('fontSize * verticalLabelHeight')) * 1px);
+      width: calc(v-bind('fontSize * verticalTickWidth') * 1px);
+      margin-top: calc(v-bind('fontSize * verticalLabelHeight') * 1px);
+      .tick {
         position: absolute;
         color: v-bind('tickColor');
-        font-size: v-bind('fontSize + "px"');
-        top: calc(var(--percent-in-range) - v-bind('fontSize / 2 + "px"'));
-        right: v-bind('borderSize + "px"');
+        font-size: calc(v-bind('fontSize') * 1px);
+        top: var(--percent-in-range);
+        right: calc(v-bind('borderSize') * 1px);
         text-align: right;
       }
     }

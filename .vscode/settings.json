@@ -1,3 +1,5 @@
 {
-    "vitest.enable": true
+    "vitest.enable": true,
+    "vitest.commandLine": "npm run test",
+    "typescript.tsdk": "node_modules\\typescript\\lib"
 }

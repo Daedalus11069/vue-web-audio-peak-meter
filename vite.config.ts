@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
@@ -22,6 +23,12 @@ export default defineConfig({
           vue: 'Vue'
         }
       }
+    }
+  },
+  test: {
+    environment: 'jsdom',
+    typecheck: {
+      checker: 'vue-tsc'
     }
   },
   plugins: [vue()]
