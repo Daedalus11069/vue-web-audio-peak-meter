@@ -1,4 +1,4 @@
-import { dbFromFloat, findAudioProcBufferSize, testSignalGenerator, dbTicks } from './utils';
+import { dbFromFloat, findAudioProcBufferSize, testSignalGenerator, dbTicks } from '../src/utils';
 
 describe('dbFromFloat functionality', () => {
   it('has a zero based full-scale', () => {

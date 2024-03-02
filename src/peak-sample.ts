@@ -14,8 +14,8 @@ export function calculateMaxValues(inputBuffer: AudioBuffer): Array<number> {
   return channelMaxes;
 }
 
-export function peakValues(input:Float32Array[]): number[] {
-  return input.map(channel => {
+export function peakValues(input: Float32Array[]): number[] {
+  return input.map((channel) => {
     let max = 0;
     for (let s = 0; s < channel.length; s++) {
       const sAbs = Math.abs(channel[s]);

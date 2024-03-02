@@ -1,5 +1,5 @@
-import { peakValues } from './peak-sample';
-import { testSignalGenerator, offsetSincGenerator, dbFromFloat } from './utils';
+import { peakValues } from '../src/peak-sample';
+import { testSignalGenerator, offsetSincGenerator, dbFromFloat } from '../src/utils';
 
 describe('peakValues functionality', () => {
   it('can return maxes from channel array', () => {
