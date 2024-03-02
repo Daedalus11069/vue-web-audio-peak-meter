@@ -1,4 +1,19 @@
-import { dbFromFloat, findAudioProcBufferSize, testSignalGenerator, dbTicks } from '../src/utils';
+import { expect, describe, it } from 'vitest';
+import {
+  dbFromFloat,
+  findAudioProcBufferSize,
+  testSignalGenerator,
+  dbTicks,
+  audioClipPercent
+} from '../src/utils';
+
+describe('audioClipPath functionality', () => {
+  it('can handle values in the middle of the range (vertical)', () => {
+    expect.hasAssertions();
+    const clipPath = audioClipPercent(-24, -48, 0, true);
+    expect(clipPath).toBe(50);
+  });
+});
 
 describe('dbFromFloat functionality', () => {
   it('has a zero based full-scale', () => {

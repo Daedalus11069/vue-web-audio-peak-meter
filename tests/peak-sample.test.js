@@ -1,3 +1,4 @@
+import { expect, describe, it } from 'vitest';
 import { peakValues } from '../src/peak-sample';
 import { testSignalGenerator, offsetSincGenerator, dbFromFloat } from '../src/utils';
 

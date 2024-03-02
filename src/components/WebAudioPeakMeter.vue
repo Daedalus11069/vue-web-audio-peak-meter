@@ -24,7 +24,7 @@
 import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
 import { defaultConfig } from '../config';
 import type { PeakMeterConfig } from '../config';
-import { dbFromFloat, dbTicks } from '../utils';
+import { audioClipPercent, dbFromFloat, dbTicks } from '../utils';
 import peakSampleProcessor from '../peak-sample-processor?url';
 import truePeakProcessor from '../true-peak-processor?url';
 
@@ -92,13 +92,7 @@ const channels = computed<{ label: string; percent: number }[]>(() => {
   const chans: { label: string; percent: number }[] = [];
   for (let i = 0; i < channelCount.value; i++) {
     const db = dbFromFloat(tempPeaks.value[i]);
-    let percent = Math.floor(((dbRangeMax! - db) * 100) / (dbRangeMax! - dbRangeMin!));
-    if (percent > 100) {
-      percent = 100;
-    }
-    if (percent < 0) {
-      percent = 0;
-    }
+    let percent = audioClipPercent(db, dbRangeMin, dbRangeMax);
 
     let label = '-∞';
     if (heldPeaks.value[i] !== 0.0) {

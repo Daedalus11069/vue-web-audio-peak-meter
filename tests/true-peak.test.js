@@ -1,3 +1,4 @@
+import { expect, describe, it } from 'vitest';
 import { calculateLPFCoefficients, filterSample, truePeakValues } from '../src/true-peak';
 import { testSignalGenerator, dbFromFloat } from '../src/utils';
 

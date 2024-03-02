@@ -1,3 +1,14 @@
+export function audioClipPercent(db: number, dbRangeMin: number, dbRangeMax: number) {
+  let percent = Math.floor(((dbRangeMax - db) * 100) / (dbRangeMax - dbRangeMin));
+  if (percent > 100) {
+    percent = 100;
+  }
+  if (percent < 0) {
+    percent = 0;
+  }
+  return percent;
+}
+
 export function getBaseLog(x: number, y: number): number {
   return Math.log(y) / Math.log(x);
 }
