@@ -4,8 +4,11 @@
   "name": "vue-web-audio-peak-meter",
   "version": "1.0.0",
   "description": "A customizable peak meter using the web audio API",
-  "main": "lib/index.js",
-  "module": "lib/index.esm.js",
+  "module": "lib/web-audio-peak-meter.js",
+  "main": "lib/web-audio-peak-meter.umd.js",
+  "files": [
+    "lib/style.css"
+  ],
   "scripts": {
     "lint": "eslint .",
     "test": "vitest --",
