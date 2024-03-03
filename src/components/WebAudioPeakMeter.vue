@@ -225,11 +225,12 @@ onUnmounted(() => {
   margin: 0 auto;
   width: calc(v-bind('dbDotSize') * 1px);
   height: calc(v-bind('dbDotSize') * 1px);
-
+  border: 1px solid black;
   border-radius: 50%;
+
   &.led-yellow {
-    box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #808002 0 -1px 9px, #ff0 0 2px 12px;
     &.led-on {
+      box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #808002 0 -1px 9px, #ff0 0 2px 12px;
       background-color: rgb(255, 255, 0);
     }
     &.led-off {
@@ -238,8 +239,8 @@ onUnmounted(() => {
   }
 
   &.led-green {
-    box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #304701 0 -1px 9px, #68c400 0 2px 12px;
     &.led-on {
+      box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #304701 0 -1px 9px, #68c400 0 2px 12px;
       background-color: rgb(0, 255, 0);
     }
     &.led-off {
@@ -247,9 +248,9 @@ onUnmounted(() => {
     }
   }
   &.led-red {
-    box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px,
-      rgba(255, 0, 0, 0.5) 0 2px 12px;
     &.led-on {
+      box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px,
+        rgba(255, 0, 0, 0.5) 0 2px 12px;
       background-color: rgb(255, 0, 0);
     }
     &.led-off {
@@ -258,8 +259,6 @@ onUnmounted(() => {
   }
   &.led-gray {
     background-color: #888;
-    box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #444444 0 -1px 9px,
-      rgba(0, 0, 0, 0.5) 0 2px 12px;
   }
 }
 
