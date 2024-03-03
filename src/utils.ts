@@ -1,4 +1,4 @@
-export function audioClipPercent(db: number, dbRangeMin: number, dbRangeMax: number) {
+export function audioPercent(db: number, dbRangeMin: number, dbRangeMax: number) {
   let percent = Math.floor(((dbRangeMax - db) * 100) / (dbRangeMax - dbRangeMin));
   if (percent > 100) {
     percent = 100;
@@ -6,7 +6,7 @@ export function audioClipPercent(db: number, dbRangeMin: number, dbRangeMax: num
   if (percent < 0) {
     percent = 0;
   }
-  return percent;
+  return 100 - percent;
 }
 
 export function getBaseLog(x: number, y: number): number {
@@ -31,6 +31,31 @@ export function dbTicks(min: number, max: number, tickSize: number): number[] {
     }
   }
   return ticks;
+}
+
+export function dbDots(dotSize: number, mainContainer: HTMLDivElement): number[] {
+  const dots = [];
+  if (mainContainer) {
+    let height = mainContainer.querySelector('.peak-bar')!.clientHeight;
+    for (let i = 0; i < height - dotSize; i++) {
+      if (i % dotSize === 0) {
+        dots.push(0);
+      }
+    }
+    dots.splice(
+      0,
+      dots.length,
+      ...dots
+        .reverse()
+        .map((_dot, dot) => {
+          return Math.floor((dot / dots.length) * 100);
+        })
+        .reverse()
+    );
+
+    dots.splice(0, 1, 100);
+  }
+  return dots;
 }
 
 export function testSignalGenerator(hz: number, rotation = 0.0, sampleRate = 48000): number[] {

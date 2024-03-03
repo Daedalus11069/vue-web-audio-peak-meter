@@ -1,19 +1,48 @@
 <template>
-  <div>
-    <div class="container" :class="{ vertical }">
+  <div ref="mainContainer">
+    <div class="container">
       <div class="channels">
-        <div class="channel" v-for="channel in channels">
-          <div class="peak-label">{{ channel.label }}</div>
-          <div class="peak-bar" :style="`--audio-clip-path: ${channel.percent}%`"></div>
+        <div class="channel">
+          <div class="peak-label">{{ channels[0].label }}</div>
+          <div class="peak-bar">
+            <div
+              class="led"
+              :class="{
+                'led-green': dotPercent <= 45 && dotPercent >= 0,
+                'led-yellow': dotPercent >= 46 && dotPercent <= 80,
+                'led-red': dotPercent >= 81 && dotPercent <= 100,
+                'led-off': channels[0].percent <= dotPercent,
+                'led-on': channels[0].percent > dotPercent
+              }"
+              v-for="dotPercent in dots"
+            ></div>
+          </div>
         </div>
-      </div>
-      <div class="ticks">
-        <div
-          class="tick"
-          :style="`--percent-in-range: ${percentInRange}%`"
-          v-for="{ tick, percentInRange } in ticks"
-        >
-          {{ tick }}
+        <div class="ticks">
+          <div
+            class="tick"
+            :style="`--percent-in-range: ${percentInRange}%`"
+            v-for="{ tick, percentInRange } in ticks"
+          >
+            {{ tick }}
+          </div>
+        </div>
+        <div class="channel">
+          <div class="peak-label">{{ channels[1].label }}</div>
+          <div class="peak-bar">
+            <div
+              class="led"
+              :data-percent="dotPercent"
+              :class="{
+                'led-green': dotPercent <= 45 && dotPercent >= 0,
+                'led-yellow': dotPercent >= 46 && dotPercent <= 80,
+                'led-red': dotPercent >= 81 && dotPercent <= 100,
+                'led-off': channels[1].percent <= dotPercent,
+                'led-on': channels[1].percent > dotPercent
+              }"
+              v-for="dotPercent in dots"
+            ></div>
+          </div>
         </div>
       </div>
     </div>
@@ -24,9 +53,11 @@
 import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
 import { defaultConfig } from '../config';
 import type { PeakMeterConfig } from '../config';
-import { audioClipPercent, dbFromFloat, dbTicks } from '../utils';
+import { audioPercent, dbDots, dbFromFloat, dbTicks } from '../utils';
 import peakSampleProcessor from '../peak-sample-processor?url';
 import truePeakProcessor from '../true-peak-processor?url';
+
+const mainContainer = ref<HTMLDivElement>();
 
 const horizontalLabelWidth = computed(() => 3);
 const verticalLabelHeight = computed(() => 1.5);
@@ -85,13 +116,16 @@ function clearPeaks() {
   }
 }
 
-const channelCount = computed(() => srcNode.value?.channelCount || 0);
+const channelCount = computed(() => {
+  return 2;
+  //return srcNode.value?.channelCount || 0;
+});
 const channels = computed<{ label: string; percent: number }[]>(() => {
   const { dbRangeMax, dbRangeMin } = props;
   const chans: { label: string; percent: number }[] = [];
   for (let i = 0; i < channelCount.value; i++) {
     const db = dbFromFloat(tempPeaks.value[i]);
-    let percent = audioClipPercent(db, dbRangeMin, dbRangeMax);
+    let percent = audioPercent(db, dbRangeMin, dbRangeMax);
 
     let label = '-∞';
     if (heldPeaks.value[i] !== 0.0) {
@@ -116,6 +150,11 @@ const ticks = computed<Array<{ tick: number; percentInRange: number }>>(() => {
     tick,
     percentInRange: ((dbRangeMax! - tick) / (dbRangeMax! - dbRangeMin!)) * 100
   }));
+});
+
+const dots = computed<Array<number>>(() => {
+  const { dbDotSize } = props;
+  return dbDots(dbDotSize!, mainContainer.value!);
 });
 
 const gradientJoined = computed(() => {
@@ -181,11 +220,55 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
+.led {
+  margin: 0 auto;
+  width: calc(v-bind('dbDotSize') * 1px);
+  height: calc(v-bind('dbDotSize') * 1px);
+
+  border-radius: 50%;
+  &.led-yellow {
+    box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #808002 0 -1px 9px, #ff0 0 2px 12px;
+    &.led-on {
+      background-color: rgb(255, 255, 0);
+    }
+    &.led-off {
+      background-color: rgb(100, 100, 0);
+    }
+  }
+
+  &.led-green {
+    box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #304701 0 -1px 9px, #68c400 0 2px 12px;
+    &.led-on {
+      background-color: rgb(0, 255, 0);
+    }
+    &.led-off {
+      background-color: rgb(0, 100, 0);
+    }
+  }
+  &.led-red {
+    box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px,
+      rgba(255, 0, 0, 0.5) 0 2px 12px;
+    &.led-on {
+      background-color: rgb(255, 0, 0);
+    }
+    &.led-off {
+      background-color: rgb(100, 0, 0);
+    }
+  }
+  &.led-gray {
+    background-color: #888;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #444444 0 -1px 9px,
+      rgba(0, 0, 0, 0.5) 0 2px 12px;
+  }
+}
+
 .container {
   background-color: v-bind('backgroundColor');
   box-sizing: border-box;
   height: 100%;
   padding: calc(v-bind('borderSize') * 1px);
+  display: flex;
+  flex-direction: row-reverse;
 
   .peak-label {
     color: v-bind('labelColor');
@@ -195,85 +278,42 @@ onUnmounted(() => {
     --channel-size: calc(50% - 1px);
     justify-content: space-between;
   }
-  &:not(.vertical) .channels {
+
+  .channels {
     display: flex;
-    flex-direction: column;
-    height: calc(100% - (v-bind('fontSize * horizontalTickHeight') * 1px));
+    flex-direction: row;
+    height: 100%;
     width: 100%;
     .channel {
-      display: flex;
-      height: var(--channel-size);
-      width: 100%;
-      flex-direction: row-reverse;
+      height: 100%;
+      width: var(--channel-size);
       .peak-label {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: calc(v-bind('fontSize * horizontalLabelWidth') * 1px);
+        height: calc(v-bind('fontSize * verticalLabelHeight') * 1px);
+        width: 100%;
+        text-align: center;
       }
       .peak-bar {
-        height: 100%;
-        width: calc((100% - v-bind('cssVars.horizontalBarWidth')));
-        background-image: linear-gradient(to left, v-bind('gradientJoined'));
-        transition: clip-path v-bind('maskTransition');
-        clip-path: inset(0 var(--audio-clip-path) 0 0);
+        display: flex;
+        flex-direction: column;
+        height: calc(100% - v-bind('cssVars.verticalBarHeight'));
+        width: 100%;
+        transition: all v-bind('maskTransition');
       }
     }
   }
 
-  &:not(.vertical) .ticks {
+  .ticks {
     position: relative;
-    height: calc(v-bind('fontSize * horizontalTickHeight') * 1px);
-    width: calc((100% - v-bind('fontSize * horizontalLabelWidth')) * 1px);
-    margin-right: calc(v-bind('fontSize * horizontalLabelWidth') * 1px);
+    height: calc((100% - v-bind('fontSize * verticalLabelHeight')) * 1px);
+    width: calc(v-bind('fontSize * verticalTickWidth') * 1px);
+    margin-top: calc(v-bind('fontSize * verticalLabelHeight') * 1px);
     .tick {
       position: absolute;
       color: v-bind('tickColor');
       font-size: calc(v-bind('fontSize') * 1px);
-      right: var(--percent-in-range);
-      transform: translateX(50%);
-    }
-  }
-
-  &.vertical {
-    display: flex;
-    flex-direction: row-reverse;
-    .channels {
-      display: flex;
-      flex-direction: row;
-      height: 100%;
-      width: calc((100% - v-bind('cssVars.verticalChannelWidth')));
-      .channel {
-        height: 100%;
-        width: var(--channel-size);
-        .peak-label {
-          height: calc(v-bind('fontSize * verticalLabelHeight') * 1px);
-          width: 100%;
-          text-align: center;
-        }
-        .peak-bar {
-          height: calc(100% - v-bind('cssVars.verticalBarHeight'));
-          width: 100%;
-          background-image: linear-gradient(to bottom, v-bind('gradientJoined'));
-          clip-path: inset(var(--audio-clip-path) 0 0);
-          transition: clip-path v-bind('maskTransition');
-        }
-      }
-    }
-
-    .ticks {
-      position: relative;
-      height: calc((100% - v-bind('fontSize * verticalLabelHeight')) * 1px);
-      width: calc(v-bind('fontSize * verticalTickWidth') * 1px);
-      margin-top: calc(v-bind('fontSize * verticalLabelHeight') * 1px);
-      .tick {
-        position: absolute;
-        color: v-bind('tickColor');
-        font-size: calc(v-bind('fontSize') * 1px);
-        top: var(--percent-in-range);
-        right: calc(v-bind('borderSize') * 1px);
-        text-align: right;
-      }
+      top: var(--percent-in-range);
+      right: calc(v-bind('borderSize') * 1px);
+      text-align: right;
     }
   }
 }

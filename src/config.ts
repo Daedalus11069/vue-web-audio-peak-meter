@@ -1,5 +1,4 @@
 export interface PeakMeterConfig {
-  vertical?: boolean;
   height?: number;
   borderSize?: number;
   fontSize?: number;
@@ -10,13 +9,13 @@ export interface PeakMeterConfig {
   dbRangeMin?: number;
   dbRangeMax?: number;
   dbTickSize?: number;
+  dbDotSize?: number;
   maskTransition?: string;
   audioMeterStandard?: string;
   peakHoldDuration?: number;
 }
 
 export const defaultConfig = {
-  vertical: false,
   height: 80,
   borderSize: 2,
   fontSize: 9,
@@ -27,6 +26,7 @@ export const defaultConfig = {
   dbRangeMin: -48,
   dbRangeMax: 0,
   dbTickSize: 6,
+  dbDotSize: 10,
   maskTransition: '0.1s',
   audioMeterStandard: 'peak-sample',
   peakHoldDuration: 0
