@@ -1,44 +1,44 @@
 <template>
-  <div ref="mainContainer">
-    <div class="container">
-      <div class="channels">
-        <div class="channel">
-          <div class="peak-label">{{ channels[0].label }}</div>
-          <div class="peak-bar">
+  <div ref="mainContainer" class="web-audio-peak-meter">
+    <div class="wapm-container">
+      <div class="wapm-channels">
+        <div class="wapm-channel">
+          <div class="wapm-peak-label">{{ channels[0].label }}</div>
+          <div class="wapm-peak-bar">
             <div
-              class="led"
+              class="wapm-led"
               :class="{
-                'led-green': dotPercent <= 45 && dotPercent >= 0,
-                'led-yellow': dotPercent >= 46 && dotPercent <= 80,
-                'led-red': dotPercent >= 81 && dotPercent <= 100,
-                'led-off': channels[0].percent <= dotPercent,
-                'led-on': channels[0].percent > dotPercent
+                'wapm-led-green': dotPercent <= 45 && dotPercent >= 0,
+                'wapm-led-yellow': dotPercent >= 46 && dotPercent <= 80,
+                'wapm-led-red': dotPercent >= 81 && dotPercent <= 100,
+                'wapm-led-off': channels[0].percent <= dotPercent,
+                'wapm-led-on': channels[0].percent > dotPercent
               }"
               v-for="dotPercent in dots"
             ></div>
           </div>
         </div>
-        <div class="ticks">
+        <div class="wapm-ticks">
           <div
-            class="tick"
+            class="wapm-tick"
             :style="`--percent-in-range: ${percentInRange}%`"
             v-for="{ tick, percentInRange } in ticks"
           >
             {{ tick }}
           </div>
         </div>
-        <div class="channel">
-          <div class="peak-label">{{ channels[1].label }}</div>
-          <div class="peak-bar">
+        <div class="wapm-channel">
+          <div class="wapm-peak-label">{{ channels[1].label }}</div>
+          <div class="wapm-peak-bar">
             <div
-              class="led"
+              class="wapm-led"
               :data-percent="dotPercent"
               :class="{
-                'led-green': dotPercent <= 45 && dotPercent >= 0,
-                'led-yellow': dotPercent >= 46 && dotPercent <= 80,
-                'led-red': dotPercent >= 81 && dotPercent <= 100,
-                'led-off': channels[1].percent <= dotPercent,
-                'led-on': channels[1].percent > dotPercent
+                'wapm-led-green': dotPercent <= 45 && dotPercent >= 0,
+                'wapm-led-yellow': dotPercent >= 46 && dotPercent <= 80,
+                'wapm-led-red': dotPercent >= 81 && dotPercent <= 100,
+                'wapm-led-off': channels[1].percent <= dotPercent,
+                'wapm-led-on': channels[1].percent > dotPercent
               }"
               v-for="dotPercent in dots"
             ></div>
@@ -221,99 +221,101 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.led {
-  margin: 0 auto;
-  width: calc(v-bind('dbDotSize') * 1px);
-  height: calc(v-bind('dbDotSize') * 1px);
-  border: 1px solid black;
-  border-radius: 50%;
+.web-audio-peak-meter {
+  .wapm-led {
+    margin: 0 auto;
+    width: calc(v-bind('dbDotSize') * 1px);
+    height: calc(v-bind('dbDotSize') * 1px);
+    border: 1px solid black;
+    border-radius: 50%;
 
-  &.led-yellow {
-    &.led-on {
-      box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #808002 0 -1px 9px, #ff0 0 2px 12px;
-      background-color: rgb(255, 255, 0);
+    &.wapm-led-yellow {
+      &.wapm-led-on {
+        box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #808002 0 -1px 9px, #ff0 0 2px 12px;
+        background-color: rgb(255, 255, 0);
+      }
+      &.wapm-led-off {
+        background-color: rgb(100, 100, 0);
+      }
     }
-    &.led-off {
-      background-color: rgb(100, 100, 0);
-    }
-  }
 
-  &.led-green {
-    &.led-on {
-      box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #304701 0 -1px 9px, #68c400 0 2px 12px;
-      background-color: rgb(0, 255, 0);
+    &.wapm-led-green {
+      &.wapm-led-on {
+        box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #304701 0 -1px 9px, #68c400 0 2px 12px;
+        background-color: rgb(0, 255, 0);
+      }
+      &.wapm-led-off {
+        background-color: rgb(0, 100, 0);
+      }
     }
-    &.led-off {
-      background-color: rgb(0, 100, 0);
+    &.wapm-led-red {
+      &.wapm-led-on {
+        box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px,
+          rgba(255, 0, 0, 0.5) 0 2px 12px;
+        background-color: rgb(255, 0, 0);
+      }
+      &.wapm-led-off {
+        background-color: rgb(100, 0, 0);
+      }
     }
-  }
-  &.led-red {
-    &.led-on {
-      box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px,
-        rgba(255, 0, 0, 0.5) 0 2px 12px;
-      background-color: rgb(255, 0, 0);
+    &.wapm-led-gray {
+      background-color: #888;
     }
-    &.led-off {
-      background-color: rgb(100, 0, 0);
-    }
-  }
-  &.led-gray {
-    background-color: #888;
-  }
-}
-
-.container {
-  background-color: v-bind('backgroundColor');
-  box-sizing: border-box;
-  height: 100%;
-  padding: calc(v-bind('borderSize') * 1px);
-  display: flex;
-  flex-direction: row-reverse;
-
-  .peak-label {
-    color: v-bind('labelColor');
-    font-size: calc(v-bind('fontSize') * 1px);
-  }
-  .channels {
-    --channel-size: calc(50% - 1px);
-    justify-content: space-between;
   }
 
-  .channels {
-    display: flex;
-    flex-direction: row;
+  .wapm-container {
+    background-color: v-bind('backgroundColor');
+    box-sizing: border-box;
     height: 100%;
-    width: 100%;
-    .channel {
+    padding: calc(v-bind('borderSize') * 1px);
+    display: flex;
+    flex-direction: row-reverse;
+
+    .wapm-peak-label {
+      color: v-bind('labelColor');
+      font-size: calc(v-bind('fontSize') * 1px);
+    }
+    .wapm-channels {
+      --channel-size: calc(50% - 1px);
+      justify-content: space-between;
+    }
+
+    .wapm-channels {
+      display: flex;
+      flex-direction: row;
       height: 100%;
-      width: var(--channel-size);
-      .peak-label {
-        height: calc(v-bind('fontSize * verticalLabelHeight') * 1px);
-        width: 100%;
-        text-align: center;
-      }
-      .peak-bar {
-        display: flex;
-        flex-direction: column;
-        height: calc(100% - v-bind('cssVars.verticalBarHeight'));
-        width: 100%;
-        transition: all v-bind('maskTransition');
+      width: 100%;
+      .wapm-channel {
+        height: 100%;
+        width: var(--channel-size);
+        .wapm-peak-label {
+          height: calc(v-bind('fontSize * verticalLabelHeight') * 1px);
+          width: 100%;
+          text-align: center;
+        }
+        .wapm-peak-bar {
+          display: flex;
+          flex-direction: column;
+          height: calc(100% - v-bind('cssVars.verticalBarHeight'));
+          width: 100%;
+          transition: all v-bind('maskTransition');
+        }
       }
     }
-  }
 
-  .ticks {
-    position: relative;
-    height: calc((100% - v-bind('fontSize * verticalLabelHeight')) * 1px);
-    width: calc(v-bind('fontSize * verticalTickWidth') * 1px);
-    margin-top: calc(v-bind('fontSize * verticalLabelHeight') * 1px);
-    .tick {
-      position: absolute;
-      color: v-bind('tickColor');
-      font-size: calc(v-bind('fontSize') * 1px);
-      top: var(--percent-in-range);
-      right: calc(v-bind('borderSize') * 1px);
-      text-align: right;
+    .wapm-ticks {
+      position: relative;
+      height: calc((100% - v-bind('fontSize * verticalLabelHeight')) * 1px);
+      width: calc(v-bind('fontSize * verticalTickWidth') * 1px);
+      margin-top: calc(v-bind('fontSize * verticalLabelHeight') * 1px);
+      .wapm-tick {
+        position: absolute;
+        color: v-bind('tickColor');
+        font-size: calc(v-bind('fontSize') * 1px);
+        top: var(--percent-in-range);
+        right: calc(v-bind('borderSize') * 1px);
+        text-align: right;
+      }
     }
   }
 }
