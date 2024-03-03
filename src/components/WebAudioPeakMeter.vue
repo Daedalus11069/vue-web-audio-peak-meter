@@ -159,6 +159,8 @@ function observeHeight() {
   });
 
   resizeObserver.observe(mainContainer.value?.querySelector('.wapm-peak-bar')!);
+  console.log(mainContainer.value?.querySelector('.wapm-peak-bar')?.clientHeight);
+  peakBarHeight.value = mainContainer.value?.querySelector('.wapm-peak-bar')?.clientHeight || 0;
 }
 
 const dots = computed<Array<number>>(() => {
@@ -236,6 +238,7 @@ onMounted(async () => {
       once: true
     }
   );
+  observeHeight();
 });
 
 onUnmounted(() => {
@@ -243,7 +246,6 @@ onUnmounted(() => {
     node.value.disconnect();
     node.value = undefined;
   }
-  observeHeight();
 });
 </script>
 
@@ -255,10 +257,11 @@ onUnmounted(() => {
     height: calc(v-bind('dbDotSize') * 1px);
     border: 1px solid black;
     border-radius: 50%;
+    box-sizing: border-box;
 
     &.wapm-led-yellow {
       &.wapm-led-on {
-        box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #808002 0 -1px 9px, #ff0 0 2px 12px;
+        box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, #808002 0 -1px 9px, #ff0 0 2px 12px;
         background-color: rgb(255, 255, 0);
       }
       &.wapm-led-off {
@@ -268,7 +271,7 @@ onUnmounted(() => {
 
     &.wapm-led-green {
       &.wapm-led-on {
-        box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #304701 0 -1px 9px, #68c400 0 2px 12px;
+        box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, #304701 0 -1px 9px, #68c400 0 2px 12px;
         background-color: rgb(0, 255, 0);
       }
       &.wapm-led-off {
@@ -277,7 +280,7 @@ onUnmounted(() => {
     }
     &.wapm-led-red {
       &.wapm-led-on {
-        box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px,
+        box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, #441313 0 -1px 9px,
           rgba(255, 0, 0, 0.5) 0 2px 12px;
         background-color: rgb(255, 0, 0);
       }
