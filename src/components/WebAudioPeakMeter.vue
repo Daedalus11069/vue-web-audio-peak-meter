@@ -59,18 +59,17 @@ function handleNodePortMessage(ev: MessageEvent) {
         tempPeaks.value.fill(0.0, peaks.length);
       }
       for (let i = 0; i < peaks.length; i += 1) {
-        heldPeaks.value[i] = peaks[i];
-        // if (peaks[i] > heldPeaks.value[i]) {
-        //   heldPeaks.value[i] = peaks[i];
-        //   if (peakHoldTimeouts.value[i]) {
-        //     clearTimeout(peakHoldTimeouts.value[i]);
-        //   }
-        //   if (props.peakHoldDuration) {
-        //     peakHoldTimeouts.value[i] = window.setTimeout(() => {
-        //       clearPeak(i);
-        //     }, props.peakHoldDuration);
-        //   }
-        // }
+        if (peaks[i] > heldPeaks.value[i]) {
+          heldPeaks.value[i] = peaks[i];
+          if (peakHoldTimeouts.value[i]) {
+            clearTimeout(peakHoldTimeouts.value[i]);
+          }
+          if (props.peakHoldDuration) {
+            peakHoldTimeouts.value[i] = window.setTimeout(() => {
+              clearPeak(i);
+            }, props.peakHoldDuration);
+          }
+        }
       }
     }
   });
@@ -129,8 +128,6 @@ const cssVars = computed(() => ({
   horizontalBarWidth: props.fontSize * horizontalLabelWidth.value + 'px'
 }));
 
-//const totalBorder = computed(() => (channels.value.length - 1) * props.borderSize);
-
 defineExpose({ peaks, clearPeaks, srcNode });
 
 onMounted(async () => {
@@ -166,7 +163,7 @@ onMounted(async () => {
             }
           );
         }
-        node.value.port.onmessage = (ev: MessageEvent) => handleNodePortMessage(ev);
+        node.value.port.onmessage = handleNodePortMessage;
         srcNode.value.connect(node.value).connect(srcNode.value.context.destination);
       }
     },
@@ -192,7 +189,7 @@ onUnmounted(() => {
 
   .peak-label {
     color: v-bind('labelColor');
-    font-size: v-bind('fontSize');
+    font-size: calc(v-bind('fontSize') * 1px);
   }
   .channels {
     --channel-size: calc(50% - 1px);
