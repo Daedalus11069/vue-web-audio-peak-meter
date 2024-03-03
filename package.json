@@ -34,7 +34,6 @@
     "@vitejs/plugin-vue": "^5.0.4",
     "@vue/test-utils": "^2.4.4",
     "@vue/tsconfig": "^0.5.1",
-    "finalhandler": "^1.2.0",
     "jsdom": "^21.1.2",
     "marked": "^4.3.0",
     "prettier": "^2.8.7",
