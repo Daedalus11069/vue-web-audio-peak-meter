@@ -1,7 +1,7 @@
 {
   "private": true,
   "type": "module",
-  "name": "vue-web-audio-peak-meter",
+  "name": "@daedalus11069/vue-web-audio-peak-meter",
   "version": "1.0.0",
   "description": "A customizable peak meter using the web audio API",
   "module": "lib/web-audio-peak-meter.js",
