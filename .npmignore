@@ -1,5 +1,5 @@
 docs/
-src/*.test.ts
+tests/*
 .eslintrc.json
 .gitignore
 .npmignore
