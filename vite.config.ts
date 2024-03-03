@@ -10,7 +10,7 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname, 'src/entry.ts'),
       name: 'WebAudioPeakMeter',
-      fileName: 'web-audio-peak-meter'
+      fileName: 'index'
     },
     rollupOptions: {
       // make sure to externalize deps that shouldn't be bundled

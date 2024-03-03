@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "A customizable peak meter using the web audio API",
   "type": "module",
-  "module": "lib/web-audio-peak-meter.js",
-  "main": "lib/web-audio-peak-meter.umd.js",
+  "module": "lib/index.js",
+  "main": "lib/index.umd.js",
   "files": [
     "lib/style.css"
   ],

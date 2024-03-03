@@ -53,7 +53,7 @@
 import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
 import { defaultConfig } from '../config';
 import type { PeakMeterConfig } from '../config';
-import { audioPercent, dbDots, dbFromFloat, dbTicks } from '../utils';
+import { audioPercent, dbFromFloat, dbTicks } from '../utils';
 import peakSampleProcessor from '../peak-sample-processor?url';
 import truePeakProcessor from '../true-peak-processor?url';
 
@@ -71,6 +71,7 @@ const props = withDefaults(defineProps<PeakMeterConfig>(), defaultConfig);
 const tempPeaks = ref<Array<number>>([]);
 const heldPeaks = ref<Array<number>>([]);
 const peakHoldTimeouts = ref<Array<number>>([]);
+const peakBarHeight = ref(0);
 
 function handleNodePortMessage(ev: MessageEvent) {
   if (ev.data.type === 'message') {
@@ -152,13 +153,38 @@ const ticks = computed<Array<{ tick: number; percentInRange: number }>>(() => {
   }));
 });
 
+function observeHeight() {
+  const resizeObserver = new ResizeObserver(function () {
+    peakBarHeight.value = mainContainer.value?.querySelector('.wapm-peak-bar')?.clientHeight || 0;
+  });
+
+  resizeObserver.observe(mainContainer.value?.querySelector('.wapm-peak-bar')!);
+}
+
 const dots = computed<Array<number>>(() => {
   const { dbDotSize } = props;
-  return dbDots(dbDotSize!, mainContainer.value!);
-});
+  const dots = [];
+  if (mainContainer.value) {
+    let height = peakBarHeight.value;
+    for (let i = 0; i < height - dbDotSize; i++) {
+      if (i % dbDotSize === 0) {
+        dots.push(0);
+      }
+    }
+    dots.splice(
+      0,
+      dots.length,
+      ...dots
+        .reverse()
+        .map((_dot, dot) => {
+          return Math.floor((dot / dots.length) * 100);
+        })
+        .reverse()
+    );
 
-const gradientJoined = computed(() => {
-  return props.gradient.join(', ');
+    dots.splice(0, 1, 100);
+  }
+  return dots;
 });
 
 const cssVars = computed(() => ({
@@ -217,6 +243,7 @@ onUnmounted(() => {
     node.value.disconnect();
     node.value = undefined;
   }
+  observeHeight();
 });
 </script>
 

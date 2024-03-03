@@ -33,31 +33,6 @@ export function dbTicks(min: number, max: number, tickSize: number): number[] {
   return ticks;
 }
 
-export function dbDots(dotSize: number, mainContainer: HTMLDivElement): number[] {
-  const dots = [];
-  if (mainContainer) {
-    let height = mainContainer.querySelector('.peak-bar')!.clientHeight;
-    for (let i = 0; i < height - dotSize; i++) {
-      if (i % dotSize === 0) {
-        dots.push(0);
-      }
-    }
-    dots.splice(
-      0,
-      dots.length,
-      ...dots
-        .reverse()
-        .map((_dot, dot) => {
-          return Math.floor((dot / dots.length) * 100);
-        })
-        .reverse()
-    );
-
-    dots.splice(0, 1, 100);
-  }
-  return dots;
-}
-
 export function testSignalGenerator(hz: number, rotation = 0.0, sampleRate = 48000): number[] {
   const indices = Array.from(Array(128).keys());
   return indices.map((x) => Math.sin(((x * hz) / sampleRate) * 2.0 * Math.PI + rotation));
