@@ -159,7 +159,6 @@ function observeHeight() {
   });
 
   resizeObserver.observe(mainContainer.value?.querySelector('.wapm-peak-bar')!);
-  console.log(mainContainer.value?.querySelector('.wapm-peak-bar')?.clientHeight);
   peakBarHeight.value = mainContainer.value?.querySelector('.wapm-peak-bar')?.clientHeight || 0;
 }
 
