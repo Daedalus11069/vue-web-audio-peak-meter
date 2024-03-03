@@ -215,6 +215,7 @@ onMounted(async () => {
 onUnmounted(() => {
   if (node.value) {
     node.value.disconnect();
+    node.value = undefined;
   }
 });
 </script>
